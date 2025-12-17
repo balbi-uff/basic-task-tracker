@@ -2,6 +2,7 @@ import json
 
 from core.Task import Task
 from core.TaskStatus import TaskStatus
+from core.Utils import getNowAsStr
 
 TASKS_FILENAME = "current_tasks.json"
 
@@ -45,6 +46,7 @@ class TaskHandler:
 
     def save_task(self, task: Task):
         self.current_tasks = self.get_current_tasks()
+        task.updateDateOfTask()
         self.current_tasks[task.getId()] = task.toDict()
         self.save_tasks_dict_in_json_file()
 
@@ -72,6 +74,8 @@ class TaskHandler:
 
         if status:
             foundTask["status"] = status
+
+        foundTask["updateDate"] = getNowAsStr()
 
         self.save_task_as_dict(foundTask)
 
@@ -103,4 +107,4 @@ class TaskHandler:
 
 
 def convertLoadedJsonDictToTask(_id, task_dict):
-    return Task(task_dict["name"], task_dict["status"], task_dict["description"]).withId(_id)
+    return Task(task_dict["name"], task_dict["status"], task_dict["description"]).setId(_id)
