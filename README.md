@@ -1,23 +1,41 @@
+# Basic Task Tracker
+
+
 The user should be able to:
 
 - [X] Add, Update, and Delete tasks
 
-Adding a task:
+Adding a task: `py .\task-cli.py add "Buy groceries"`
 
-`python main.py -c -s --name "Foo Bar" --description "Lorem ipsum dolor sit met"`
 
-- [ ] Mark a task as in progress or done
+**Requirements**:
+- [X] Mark a task as in progress or done
 
-- [ ] List all tasks
+- [X] List all tasks
 
-- [ ] List all tasks that are done
+- [X] List all tasks that are done
 
-- [ ] List all tasks that are not done
+- [X] List all tasks that are not done
 
-- [ ] List all tasks that are in progress
+- [X] List all tasks that are in progress
 
-## HOW TO USE IT
-- **Create a Task**: Use the `-c` or `--create` flag along with `--name` and `--description` to create a new task. Example:
-- **List All Tasks**: Use the `-r` or `--read-all` flag to display all tasks. Example:
-- **Update a Task**: Use the `-u` or `--update` flag along with `-id`, `--name`, `--description`, or `-s` to update an existing task. Example:
-- **Delete a Task**: Use the `-d` or `--delete` flag along with `-id` to delete a task. Example:
+### Use example
+```shell
+py .\task-cli.py add "Buy groceries"
+py .\task-cli.py update 1 "Buy groceries and cook dinner"
+py .\task-cli.py delete 1
+
+py .\task-cli.py add "Do stuff"
+py .\task-cli.py update 2 "Do stuff and idk do more stuff..."
+py .\task-cli.py mark-in-progress 2
+py .\task-cli.py list in-progress
+
+py .\task-cli.py mark-done 2
+py .\task-cli.py list done
+
+py .\task-cli.py add "Do stuff 2"
+py .\task-cli.py add "Do stuff 3"
+py .\task-cli.py add "Do stuff 4"
+py .\task-cli.py list
+
+```

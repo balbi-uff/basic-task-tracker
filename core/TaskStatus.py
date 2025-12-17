@@ -1,7 +1,8 @@
-from enum import Enum
+from enum import StrEnum
 
-class TaskStatus(Enum):
-    UNDEFINED = "UNDEFINED"
-    IN_PROGRESS = "IN_PROGRESS"
-    TODO = "TODO"
-    DONE = "DONE"
+
+class TaskStatus(StrEnum):
+    UNDEFINED = "undefined"
+    IN_PROGRESS = "in-progress"
+    TODO = "todo"
+    DONE = "done"

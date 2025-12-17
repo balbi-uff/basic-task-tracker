@@ -1,31 +1,53 @@
-from uuid import uuid4
+import json
 from core.TaskStatus import TaskStatus
 
+CONFIG_FILENAME = "config.json"
+LATEST_ID_JSON_KEYWORD = "latest_id"
+
+def getLatestIdFromJsonFile(jsonFileName):
+    try:
+        with open(jsonFileName, "r") as jsonFile:
+            jsonObject = json.load(jsonFile)
+            return jsonObject[LATEST_ID_JSON_KEYWORD]
+
+    except FileNotFoundError:
+        raise FileNotFoundError("JSON config file was not found, create a \"config.json\" in root dir!")
+
+def updateJsonFileLatestId(jsonFileName, newId):
+    with open(jsonFileName, "r") as jsonFile:
+        jsonObject = json.load(jsonFile)
+
+    jsonObject[LATEST_ID_JSON_KEYWORD] = newId
+
+    with open(jsonFileName, "w") as jsonFile:
+        json.dump(jsonObject, jsonFile)
+
+def getNextId(jsonFileName: str =CONFIG_FILENAME) -> int:
+    latest_id = getLatestIdFromJsonFile(jsonFileName)
+    updateJsonFileLatestId(jsonFileName, latest_id + 1)
+    return latest_id
 
 class Task:
     status: str
+    _id: str
 
-    def __init__(self, name, status: TaskStatus, description, marked):
+    def __init__(self, name, status: TaskStatus, description):
         self.name = name
-        self.id = str(uuid4().hex)[:4] # essa limitação de :4 é somente para testes
+        self._id = str(getNextId())
         self.status = str(status)
         self.description = description
-        self.marked = marked
     
     def toDict(self):
         return {
             "name" : self.name,
-            "id" : self.id,
+            "id" : self._id,
             "status" : self.status,
             "description": self.description,
-            "marked": self.marked
         }
 
     def __str__(self):
-        return f"Task:: id={self.id} | status={self.status} | marked={self.marked} | name={self.name} | description={self.description}... "
+        return f"Task:: id={self._id} | status={self.status} | name={self.name} | description={self.description}... "
 
-    def getMarkedStatus(self):
-        return self.marked
 
     def getName(self):
         return self.name
@@ -42,11 +64,11 @@ class Task:
         return self
 
     def withId(self, _id):
-        self.id = _id
+        self._id = _id
         return self
 
     def getId(self):
-        return self.id
+        return self._id
 
     def setName(self, name):
         return self.setVar(name, "name")
@@ -56,7 +78,3 @@ class Task:
 
     def setDescription(self, description):
         return self.setVar(description, "description")
-
-    def setMarked(self, marked_status):
-        return self.setVar(marked_status, "marked")
-

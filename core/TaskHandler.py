@@ -1,6 +1,7 @@
 import json
 
 from core.Task import Task
+from core.TaskStatus import TaskStatus
 
 TASKS_FILENAME = "current_tasks.json"
 
@@ -31,14 +32,11 @@ class TaskHandler:
 
         tasks = self.get_current_tasks()
 
-        print("ALL TASKS".center(50, "="))
         for task in tasks.values():
             local_task = convertLoadedJsonDictToTask(task["id"], task)
-            print(str(local_task))
             processedTasks.append(local_task)
 
         return processedTasks
-
 
     def save_tasks_dict_in_json_file(self):
         with open(self.task_file, 'w') as json_file:
@@ -50,26 +48,33 @@ class TaskHandler:
         self.current_tasks[task.getId()] = task.toDict()
         self.save_tasks_dict_in_json_file()
 
+    def save_task_as_dict(self, task: dict):
+        self.current_tasks[str(task["id"])] = task
+        self.save_tasks_dict_in_json_file()
 
-    def update_task_in_json_file(self, task: Task):
-        found = self.get_current_tasks().get(task.getId())
+    def mark_task_as_in_progress(self, _id: str):
+        self.update_task_by_id(_id, status=TaskStatus.IN_PROGRESS)
 
-        if not found:
-            print("Task was not found!")
-            #raise KeyError("Task was not found!")
-            return
+    def mark_task_as_done(self, _id: str):
+        self.update_task_by_id(_id, status=TaskStatus.DONE)
 
-        foundTask: Task = convertLoadedJsonDictToTask(task.getId(), found)
+    def update_task_by_id(self, _id: str, name: str = None, description: str = None, status: TaskStatus = None):
+        foundTask: dict = self.get_current_tasks().get(_id)
 
-        print(f"UPDATING... >> {str(foundTask)}")
+        if not foundTask:
+            raise KeyError("Task was not found!")
 
-        foundTask.setName(task.getName())
-        foundTask.setStatus(task.getStatus())
-        foundTask.setDescription(task.getDescription())
-        foundTask.setMarked(task.getMarkedStatus())
+        if name:
+            foundTask["name"] = name
 
-        self.save_task(foundTask)
-        print(F"UPDATED >> {str(foundTask)}")
+        if description:
+            foundTask["description"] = description
+
+        if status:
+            foundTask["status"] = status
+
+        self.save_task_as_dict(foundTask)
+
 
     def deleteTaskById(self, _id):
         tasks = self.get_current_tasks()
@@ -80,6 +85,22 @@ class TaskHandler:
         for task in tasks:
             self.save_task(task)
 
+    def get_task_by_id(self, taskId):
+        for t in self.get_all_tasks():
+            if t.getId() == taskId:
+                return t
+
+    def print_tasks_by_status(self, status: TaskStatus =None):
+        """
+        If no status is inputed, print all tasks
+        :param status: TaskStatus
+        :return: None
+        """
+
+        for task in self.get_all_tasks():
+            if task.getStatus() == status or (not status):
+                print(task)
+
 
 def convertLoadedJsonDictToTask(_id, task_dict):
-    return Task(task_dict["name"], task_dict["status"], task_dict["description"], task_dict["marked"]).withId(_id)
+    return Task(task_dict["name"], task_dict["status"], task_dict["description"]).withId(_id)
